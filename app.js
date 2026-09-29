@@ -2,6 +2,7 @@ const { mongoose } = require("mongoose");
 const express = require("express");
 const mainRouter = require("./routes/index");
 const routes = require("./routes");
+const cors = require("cors");
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -18,6 +19,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(cors());
 app.use(express.json());
 app.use("/", mainRouter);
 

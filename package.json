@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Agent610/what-to-wear-2#readme",
   "dependencies": {
+    "cors": "^2.8.6",
     "express": "^4.22.3",
     "mongoose": "^8.24.4"
   },
