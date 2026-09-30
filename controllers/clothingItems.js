@@ -1,5 +1,11 @@
 const ClothingItem = require("../models/clothingItem");
-const { SUCCESS, BAD_REQUEST, NOT_FOUND, DEFAULT } = require("../utils/errors");
+const {
+  SUCCESS,
+  BAD_REQUEST,
+  NOT_FOUND,
+  DEFAULT,
+  REQUEST_DENIED,
+} = require("../utils/errors");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -35,7 +41,16 @@ const deleteItem = (req, res) => {
 
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then(() => res.status(SUCCESS).send({ message: "Item was deleted" }))
+    .then((item) => {
+      if (String(item.owner) !== req.user._id) {
+        return res
+          .status(REQUEST_DENIED)
+          .send({ message: "You can't delete item" });
+      }
+      return item
+        .deleteOne()
+        .then(() => res.status(SUCCESS).send({ message: "Item was deleted" }));
+    })
     .catch((err) => {
       if (err.name === "DocumentNotFoundError") {
         res.status(NOT_FOUND).send({ message: "Item was not found" });
@@ -44,6 +59,7 @@ const deleteItem = (req, res) => {
           .status(BAD_REQUEST)
           .send({ message: "Search resulted in a bad request" });
       }
+
       res.status(DEFAULT).send({ message: "Default" });
     });
 };
